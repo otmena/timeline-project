@@ -1,0 +1,125 @@
+.timeline-circle {
+  position: relative;
+  width: 530px;
+  height: 530px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+
+  .circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 530px;
+    height: 530px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .point {
+    width: 12px;
+    height: 12px;
+    border: 1px solid #42567A;
+    background-color: #42567A;
+    border-radius: 50%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    /* Неактивная точка */
+    &:not(.active) {
+      transform: scale(0.8);
+    }
+
+    /* Активная точка */
+    &.active {
+      border-color: #42567A;
+      background-color: transparent;
+      color: #42567A;
+      font-size: 18px;
+      font-weight: bold;
+      z-index: 1;
+      transform: scale(2);
+    }
+
+    .timeline-circle .point.active {
+      transform-origin: center center;
+    }
+
+    .circle-point {
+      font-size: 10px;
+      color: #42567A;
+      transform: rotate(calc(var(--circle-rotation, 0deg) * -1)); 
+    }
+  }
+
+  h2 {
+    margin-top: 20px;
+    text-align: center;
+    position: absolute;
+    top: -5px;
+    left: 85%;
+    font-size: 24px;
+    color: #42567A;
+  }
+}
+
+.year-range {
+  position: absolute;
+  display: flex;
+  top: 5%;
+  left: -43%;
+  z-index: 3;
+  gap: 2rem;
+}
+
+.min-year {
+  color: #5a65f1;
+  font-size: 200px;
+  font-weight: 700;
+  line-height: 170px;
+  cursor: default;
+}
+.max-year {
+  color: #e06aa6;
+  font-size: 200px;
+  font-weight: 700;
+  line-height: 170px;
+  cursor: default;
+}
+
+.timeline-controls {
+  text-align: left;
+  margin-left: 60px;
+}
+
+.active-info {
+  color: #42567A;
+  font-size: 14px;
+}
+
+.buttons {
+  margin-top: 20px ;
+  margin-bottom: 20px ;
+  display: flex;
+  gap: 2rem;
+}
+
+.button {
+  height: 50px;
+  width: 50px;
+  border: 1px solid #42567A;
+  border-radius: 50%;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+
