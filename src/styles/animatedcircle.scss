@@ -35,13 +35,12 @@
     transition: all 0.3s ease;
     cursor: pointer;
     z-index: 10;
-
-    /* Неактивная точка */
+    transform-origin: center;
+    
     &:not(.active) {
       transform: scale(0.8);
     }
 
-    /* Активная точка */
     &.active {
       border-color: #42567A;
       background-color: transparent;
@@ -52,14 +51,9 @@
       transform: scale(2);
     }
 
-    .timeline-circle .point.active {
-      transform-origin: center center;
-    }
-
     .circle-point {
       font-size: 10px;
       color: #42567A;
-      transform: rotate(calc(var(--circle-rotation, 0deg) * -1)); 
     }
   }
 
@@ -73,6 +67,8 @@
     color: #42567A;
   }
 }
+
+
 
 .year-range {
   position: absolute;
@@ -154,5 +150,3 @@
 .slider-item.fade-in {
   animation: fade-in 1.5s forwards;
 }
-
-

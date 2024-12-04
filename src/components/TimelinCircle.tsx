@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import gsap from "gsap";
 import Slider from "./TimelineSwiper";
 import Point from "./shared/Point";
 import NavigationButtons from "./shared/NavigationButtons";
 import YearRange from "./shared/YearRange";
+import { useGSAP } from "../hooks/useGSAP";
+import { usePointsPosition } from "../hooks/usePointsPosition";
+import { useYearAndEvents } from "../hooks/useYearAndEvents";
 import "../styles/animatedcircle.scss";
 
 type EventData = {
@@ -25,98 +27,23 @@ interface TimelineCircleProps {
 const TimelineCircle: React.FC<TimelineCircleProps> = ({ pointsData }) => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [rotation, setRotation] = useState<number>(0);
-  const [activeEvents, setActiveEvents] = useState<EventData[]>(pointsData[0]?.events || []);
-  const [currentYear, setCurrentYear] = useState<number>(pointsData[0]?.year || 2024);
-  const [fadeKey, setFadeKey] = useState<number>(0); 
+  const [fadeKey, setFadeKey] = useState<number>(0);
 
-  const findMinMaxYears = (events: EventData[]) => {
-    const years = events.map((event) => parseInt(event.date));
-    const minYear = Math.min(...years);
-    const maxYear = Math.max(...years);
-    return { minYear, maxYear };
-  };
-
-  const { minYear, maxYear } = findMinMaxYears(pointsData[activeIndex]?.events || []);
-
-  const positionPoints = () => {
-    const points = document.querySelectorAll(".point");
-    const radius = 265;
-    const offset = -50;
-    points.forEach((point, i) => {
-      const angle = ((i * 360) / points.length) + offset;
-      const x = radius * Math.cos((angle * Math.PI) / 180);
-      const y = radius * Math.sin((angle * Math.PI) / 180);
-      const element = point as HTMLElement;
-      element.style.transform = `translate(${x}px, ${y}px)`;
-    });
-  };
-
-  useEffect(() => {
-    positionPoints();
-  }, [pointsData.length]);
+  const { activeEvents, minYear, maxYear, setActivePointEvents, updateYear } = useYearAndEvents(pointsData, activeIndex, rotation);
+  usePointsPosition(pointsData.length, rotation);
 
   const rotateCircle = (index: number) => {
     const rotationAngle = (360 / pointsData.length) * index;
     const adjustedRotation = -rotationAngle;
-
-    gsap.to(".circle", {
-      rotation: adjustedRotation,
-      duration: 1,
-      ease: "power2.inOut",
-      onUpdate: function () {
-        const updatedRotation = gsap.getProperty(".circle", "rotation") as number;
-        setRotation(updatedRotation);
-      },
-    });
-
-    gsap.to(".point", {
-      scale: 0.8,
-      duration: 0.3,
-      ease: "power2.inOut",
-    });
-
-    gsap.to(`.point:nth-child(${index + 1})`, {
-      scale: 2,
-      borderColor: "#42567A",
-      duration: 0.3,
-    });
+    setRotation(adjustedRotation);
   };
 
   const handleClick = (index: number) => {
     setActiveIndex(index);
-    setActiveEvents(pointsData[index].events);
-    setFadeKey((prev) => prev + 1); 
+    setActivePointEvents(index);
+    setFadeKey(prev => prev + 1);
     rotateCircle(index);
-
-    const targetYear = pointsData[index].year;
-
-    gsap.to({ year: currentYear }, {
-      year: targetYear,
-      duration: 1,
-      onUpdate: function () {
-        const newYear = Math.round(this.year);
-        if (!isNaN(newYear)) {
-          setCurrentYear(newYear);
-        }
-      },
-      onComplete: () => {
-        setCurrentYear(targetYear);
-      }
-    });
-
-    gsap.to(".min-year", {
-      textContent: minYear.toString(),
-      duration: 1,
-      ease: "power2.inOut",
-      snap: { textContent: 1 },
-    });
-
-    gsap.to(".max-year", {
-      textContent: maxYear.toString(),
-      duration: 1,
-      ease: "power2.inOut",
-      snap: { textContent: 1 },
-    });
+    updateYear(pointsData[index].year);
   };
 
   const handleButtonClick = (direction: "prev" | "next") => {
@@ -129,47 +56,26 @@ const TimelineCircle: React.FC<TimelineCircleProps> = ({ pointsData }) => {
     }
 
     setActiveIndex(newIndex);
-    setActiveEvents(pointsData[newIndex].events);
-    setFadeKey((prev) => prev + 1); 
+    setActivePointEvents(newIndex);
+    setFadeKey(prev => prev + 1);
     rotateCircle(newIndex);
-
-    const targetYear = pointsData[newIndex].year;
-    gsap.to({ year: currentYear }, {
-      year: targetYear,
-      duration: 1,
-      onUpdate: function () {
-        const newYear = Math.round(this.year);
-        if (!isNaN(newYear)) {
-          setCurrentYear(newYear);
-        }
-      },
-      onComplete: () => {
-        setCurrentYear(targetYear);
-      }
-    });
-
-    gsap.to(".min-year", {
-      textContent: minYear.toString(),
-      duration: 1,
-      ease: "power2.inOut",
-      snap: { textContent: 1 },
-    });
-
-    gsap.to(".max-year", {
-      textContent: maxYear.toString(),
-      duration: 1,
-      ease: "power2.inOut",
-      snap: { textContent: 1 },
-    });
+    updateYear(pointsData[newIndex].year);
   };
+
+  useGSAP(".circle", { rotation, duration: 1, ease: "power2.inOut" });
+  useGSAP(".point", { scale: 0.8, duration: 0, ease: "power2.inOut" });
+  useGSAP(`.point:nth-child(${activeIndex + 1})`, { scale: 2, borderColor: "#42567A", duration: 0 });
 
   useEffect(() => {
     const points = document.querySelectorAll(".point");
-    points.forEach((point) => {
-      const element = point as HTMLElement;
-      element.style.setProperty("--circle-rotation", `${rotation}deg`);
+    points.forEach((point, index) => {
+      if (point instanceof HTMLElement) {
+        const rotationAngle = (360 / pointsData.length) * index + rotation;
+        point.style.setProperty("--rotation", `${rotationAngle}deg`);
+        point.style.setProperty("--text-rotation", `${-rotationAngle}deg`);
+      }
     });
-  }, [rotation]);
+  }, [rotation, pointsData.length]);
 
   return (
     <div className="timeline-container">
