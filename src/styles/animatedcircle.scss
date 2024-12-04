@@ -19,6 +19,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 10;
   }
 
   .point {
@@ -33,6 +34,7 @@
     justify-content: center;
     transition: all 0.3s ease;
     cursor: pointer;
+    z-index: 10;
 
     /* Неактивная точка */
     &:not(.active) {
@@ -77,7 +79,7 @@
   display: flex;
   top: 5%;
   left: -43%;
-  z-index: 3;
+  z-index: 2;
   gap: 2rem;
 }
 
@@ -120,6 +122,37 @@
   border-radius: 50%;
   background-color: transparent;
   cursor: pointer;
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.slider-item {
+  opacity: 1;
+  transition: opacity 1.5s ease-in-out; 
+}
+
+.slider-item.fade-out {
+  animation: fade-out 1.5s forwards; 
+}
+
+.slider-item.fade-in {
+  animation: fade-in 1.5s forwards;
 }
 
 

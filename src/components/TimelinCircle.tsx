@@ -27,6 +27,7 @@ const TimelineCircle: React.FC<TimelineCircleProps> = ({ pointsData }) => {
   const [rotation, setRotation] = useState<number>(0);
   const [activeEvents, setActiveEvents] = useState<EventData[]>(pointsData[0]?.events || []);
   const [currentYear, setCurrentYear] = useState<number>(pointsData[0]?.year || 2024);
+  const [fadeKey, setFadeKey] = useState<number>(0); 
 
   const findMinMaxYears = (events: EventData[]) => {
     const years = events.map((event) => parseInt(event.date));
@@ -40,7 +41,7 @@ const TimelineCircle: React.FC<TimelineCircleProps> = ({ pointsData }) => {
   const positionPoints = () => {
     const points = document.querySelectorAll(".point");
     const radius = 265;
-    const offset = -50; // Смещение на 50 градусов
+    const offset = -50;
     points.forEach((point, i) => {
       const angle = ((i * 360) / points.length) + offset;
       const x = radius * Math.cos((angle * Math.PI) / 180);
@@ -84,6 +85,7 @@ const TimelineCircle: React.FC<TimelineCircleProps> = ({ pointsData }) => {
   const handleClick = (index: number) => {
     setActiveIndex(index);
     setActiveEvents(pointsData[index].events);
+    setFadeKey((prev) => prev + 1); 
     rotateCircle(index);
 
     const targetYear = pointsData[index].year;
@@ -128,6 +130,7 @@ const TimelineCircle: React.FC<TimelineCircleProps> = ({ pointsData }) => {
 
     setActiveIndex(newIndex);
     setActiveEvents(pointsData[newIndex].events);
+    setFadeKey((prev) => prev + 1); 
     rotateCircle(newIndex);
 
     const targetYear = pointsData[newIndex].year;
@@ -197,7 +200,11 @@ const TimelineCircle: React.FC<TimelineCircleProps> = ({ pointsData }) => {
         />
       </div>
 
-      {activeEvents.length > 0 && <Slider events={activeEvents} />}
+      {activeEvents.length > 0 && (
+        <div key={fadeKey} className="slider-item fade-in">
+          <Slider events={activeEvents} />
+        </div>
+      )}
     </div>
   );
 };

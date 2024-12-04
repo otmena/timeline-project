@@ -18,6 +18,5 @@ styles/ - SCSS стили.
 
 Технологии
 React
-Next.js
 TypeScript
 SCSS
